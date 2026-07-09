@@ -11,8 +11,10 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Screen } from '../../components/Screen';
 import { PrimaryButton } from '../../components/UI';
+import { LiquidBackground, Orb3D, AnimatedPressable } from '../../components/anim';
 import { colors, fontSizes, radius, spacing } from '../../theme';
 import { useApp } from '../../lib/store';
 import { suggestedPrompts } from '../../lib/chatEngine';
@@ -34,10 +36,9 @@ export default function Assistant() {
 
   return (
     <Screen edges={['top', 'left', 'right']}>
+      <LiquidBackground variant="violet" />
       <View style={styles.header}>
-        <View style={styles.headerIcon}>
-          <Text style={{ fontSize: 18 }}>✳︎</Text>
-        </View>
+        <Orb3D size={40} colorLight="#C9B8FF" colorMid={colors.violet} colorDark="#5A3AB0" float={false} glyph={<Text style={{ fontSize: 16 }}>✳︎</Text>} />
         <View>
           <Text style={styles.headerTitle}>FinPilot Assistant</Text>
           <Text style={styles.headerSubtitle}>Grounded in your real transactions & goals</Text>
@@ -71,9 +72,9 @@ export default function Assistant() {
             contentContainerStyle={styles.promptRow}
           >
             {suggestedPrompts.map((p) => (
-              <Pressable key={p} style={styles.promptChip} onPress={() => submit(p)}>
+              <AnimatedPressable key={p} style={styles.promptChip} onPress={() => submit(p)}>
                 <Text style={styles.promptChipText}>{p}</Text>
-              </Pressable>
+              </AnimatedPressable>
             ))}
           </ScrollView>
         )}
@@ -88,9 +89,11 @@ export default function Assistant() {
             onSubmitEditing={() => submit()}
             returnKeyType="send"
           />
-          <Pressable style={styles.sendBtn} onPress={() => submit()}>
-            <Ionicons name="arrow-up" size={18} color={colors.white} />
-          </Pressable>
+          <AnimatedPressable style={styles.sendBtnWrap} onPress={() => submit()}>
+            <LinearGradient colors={colors.gradientAccent} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.sendBtn}>
+              <Ionicons name="arrow-up" size={18} color={colors.white} />
+            </LinearGradient>
+          </AnimatedPressable>
         </View>
       </KeyboardAvoidingView>
     </Screen>
@@ -251,11 +254,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  sendBtnWrap: { borderRadius: 21, overflow: 'hidden' },
   sendBtn: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },

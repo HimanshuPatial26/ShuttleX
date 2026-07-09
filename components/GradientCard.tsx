@@ -19,9 +19,22 @@ export function GradientCard({
       end={{ x: 1, y: 0.1 }}
       style={[styles.card, { height }]}
     >
+      {/* diagonal glass sheen */}
+      <LinearGradient
+        colors={['rgba(255,255,255,0.35)', 'rgba(255,255,255,0.05)', 'rgba(255,255,255,0)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.9, y: 0.7 }}
+        style={styles.sheen}
+        pointerEvents="none"
+      />
       <View style={styles.topRow}>
-        <View style={styles.chip} />
-        <Text style={styles.contactless}>((•))</Text>
+        <LinearGradient
+          colors={['#F4D98B', '#C9A24B']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.chip}
+        />
+        <Text style={styles.contactless}>))) </Text>
       </View>
       {!compact && (
         <View style={styles.logoWrap}>
@@ -42,6 +55,15 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'space-between',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+  },
+  sheen: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   topRow: {
     flexDirection: 'row',
@@ -49,10 +71,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   chip: {
-    width: 34,
-    height: 24,
-    borderRadius: 5,
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    width: 36,
+    height: 26,
+    borderRadius: 6,
   },
   contactless: {
     color: 'rgba(255,255,255,0.7)',

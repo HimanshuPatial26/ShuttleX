@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { OnboardingHeader } from '../../components/OnboardingChrome';
 import { PrimaryButton } from '../../components/UI';
+import { LiquidBackground } from '../../components/anim';
 import { colors, fontSizes, radius, spacing } from '../../theme';
 import { useApp } from '../../lib/store';
 import type { UserProfile } from '../../lib/types';
@@ -38,6 +39,7 @@ export default function ProfileSetup() {
 
   return (
     <Screen edges={['top', 'left', 'right', 'bottom']}>
+      <LiquidBackground variant="aurora" />
       <OnboardingHeader step={2} total={5} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Tell us about your finances</Text>

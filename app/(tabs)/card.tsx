@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Screen } from '../../components/Screen';
 import { Sheet } from '../../components/Sheet';
 import { GradientCard } from '../../components/GradientCard';
+import { LiquidBackground, Entrance, AnimatedPressable } from '../../components/anim';
 import { colors, fontSizes, radius, spacing } from '../../theme';
 import { useApp } from '../../lib/store';
 import { formatMoney } from '../../lib/financeEngine';
@@ -16,11 +17,16 @@ export default function Card() {
 
   return (
     <Screen edges={['top', 'left', 'right']}>
+      <LiquidBackground variant="teal" />
       <View style={styles.hero}>
-        <Text style={styles.title}>Your card</Text>
-        <View style={styles.cardWrap}>
-          <GradientCard cardholder={profile.name || 'Debit'} />
-        </View>
+        <Entrance from="top">
+          <Text style={styles.title}>Your card</Text>
+        </Entrance>
+        <Entrance from="scale" delay={80}>
+          <View style={styles.cardWrap}>
+            <GradientCard cardholder={profile.name || 'Debit'} />
+          </View>
+        </Entrance>
       </View>
 
       <Sheet>
@@ -30,25 +36,33 @@ export default function Card() {
             <Text style={styles.balance}>{formatMoney(primaryBalance.amount, profile.currency)}</Text>
           </View>
 
-          <View style={styles.infoCard}>
-            <View style={styles.infoHeaderRow}>
-              <Text style={styles.infoTitle}>Card info</Text>
-              <Pressable onPress={() => setRevealed((r) => !r)} style={styles.revealBtn}>
-                <Ionicons name={revealed ? 'eye-off-outline' : 'eye-outline'} size={16} color={colors.inkSecondary} />
-                <Text style={styles.revealText}>{revealed ? 'Hide' : 'Reveal'}</Text>
-              </Pressable>
-            </View>
+          <Entrance from="bottom" delay={160}>
+            <View style={styles.infoCard}>
+              <View style={styles.infoHeaderRow}>
+                <Text style={styles.infoTitle}>Card info</Text>
+                <AnimatedPressable onPress={() => setRevealed((r) => !r)} style={styles.revealBtn}>
+                  <Ionicons name={revealed ? 'eye-off-outline' : 'eye-outline'} size={16} color={colors.inkSecondary} />
+                  <Text style={styles.revealText}>{revealed ? 'Hide' : 'Reveal'}</Text>
+                </AnimatedPressable>
+              </View>
 
-            <InfoRow label="Card number" value={revealed ? '5231 7252 1769 8152' : '•••• •••• •••• 8152'} />
-            <InfoRow label="CVC" value={revealed ? '678' : '•••'} />
-            <InfoRow label="Expiry date" value="08/29" />
-          </View>
+              <InfoRow label="Card number" value={revealed ? '5231 7252 1769 8152' : '•••• •••• •••• 8152'} />
+              <InfoRow label="CVC" value={revealed ? '678' : '•••'} />
+              <InfoRow label="Expiry date" value="08/29" />
+            </View>
+          </Entrance>
 
           <View style={styles.actionsGrid}>
-            <ActionTile icon="lock-closed-outline" label="Freeze card" />
-            <ActionTile icon="key-outline" label="Change PIN" />
-            <ActionTile icon="options-outline" label="Spend limits" />
-            <ActionTile icon="reload-outline" label="Replace card" />
+            {[
+              { icon: 'lock-closed-outline', label: 'Freeze card' },
+              { icon: 'key-outline', label: 'Change PIN' },
+              { icon: 'options-outline', label: 'Spend limits' },
+              { icon: 'reload-outline', label: 'Replace card' },
+            ].map((a, i) => (
+              <Entrance key={a.label} index={i} delay={220} style={styles.actionTileWrap}>
+                <ActionTile icon={a.icon} label={a.label} />
+              </Entrance>
+            ))}
           </View>
         </ScrollView>
       </Sheet>
@@ -67,12 +81,12 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 function ActionTile({ icon, label }: { icon: any; label: string }) {
   return (
-    <Pressable style={styles.actionTile}>
+    <AnimatedPressable style={styles.actionTile}>
       <View style={styles.actionTileIcon}>
         <Ionicons name={icon} size={20} color={colors.inkPrimary} />
       </View>
       <Text style={styles.actionTileLabel}>{label}</Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -89,6 +103,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.lg,
     marginTop: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   infoHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
   infoTitle: { fontSize: fontSizes.base, fontWeight: '700', color: colors.inkPrimary },
@@ -99,7 +115,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(14,18,32,0.06)',
+    borderTopColor: 'rgba(255,255,255,0.09)',
   },
   infoLabel: { color: colors.inkMuted, fontSize: 13.5 },
   infoValue: { color: colors.inkPrimary, fontSize: 13.5, fontWeight: '600', letterSpacing: 0.5 },
@@ -110,18 +126,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     marginTop: spacing.xl,
   },
-  actionTile: {
+  actionTileWrap: {
     width: '47%',
+  },
+  actionTile: {
+    width: '100%',
     backgroundColor: colors.sheetElevated,
     borderRadius: radius.lg,
     padding: spacing.lg,
     gap: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   actionTileIcon: {
     width: 38,
     height: 38,
     borderRadius: 12,
-    backgroundColor: 'rgba(14,18,32,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.07)',
     alignItems: 'center',
     justifyContent: 'center',
   },

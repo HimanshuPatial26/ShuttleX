@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: radius.md,
-    backgroundColor: 'rgba(14,18,32,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.07)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -58,6 +58,6 @@ const styles = StyleSheet.create({
   category: { fontSize: 12.5, color: colors.inkMuted, marginTop: 2 },
   right: { alignItems: 'flex-end' },
   amount: { fontSize: 15, fontWeight: '700', color: colors.inkPrimary },
-  amountPositive: { color: '#12946B' },
+  amountPositive: { color: colors.success },
   method: { fontSize: 11.5, color: colors.inkMuted, marginTop: 2 },
 });
