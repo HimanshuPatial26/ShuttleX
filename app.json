@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "FinPilot AI",
+    "slug": "finpilot",
+    "version": "1.0.0",
+    "scheme": "finpilot",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "backgroundColor": "#0A0E17",
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "FinPilot uses Face ID to securely unlock your financial data."
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ai.finpilot.app",
+      "infoPlist": {
+        "UIUserInterfaceStyle": "Dark"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0E17",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "ai.finpilot.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
