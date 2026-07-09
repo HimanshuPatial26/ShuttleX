@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { OnboardingHeader } from '../../components/OnboardingChrome';
 import { PrimaryButton } from '../../components/UI';
+import { LiquidBackground, Entrance } from '../../components/anim';
 import { colors, fontSizes, spacing } from '../../theme';
 import { useApp } from '../../lib/store';
 
@@ -17,11 +18,14 @@ export default function Signup() {
 
   return (
     <Screen edges={['top', 'left', 'right', 'bottom']}>
+      <LiquidBackground variant="teal" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <OnboardingHeader step={1} total={5} />
         <View style={styles.content}>
-          <Text style={styles.title}>Let's get you set up</Text>
-          <Text style={styles.subtitle}>Create your FinPilot account. It only takes a minute.</Text>
+          <Entrance from="bottom">
+            <Text style={styles.title}>Let's get you set up</Text>
+            <Text style={styles.subtitle}>Create your FinPilot account. It only takes a minute.</Text>
+          </Entrance>
 
           <View style={styles.form}>
             <Field label="Full name" value={name} onChangeText={setName} placeholder="Alex Morgan" />

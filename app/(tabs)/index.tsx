@@ -1,17 +1,19 @@
 import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Screen } from '../../components/Screen';
 import { Sheet } from '../../components/Sheet';
 import { HealthGauge } from '../../components/HealthGauge';
 import { CurrencyPill, QuickAction, SectionHeader } from '../../components/UI';
 import { RecommendationCard } from '../../components/RecommendationCard';
 import { TransactionRow } from '../../components/TransactionRow';
+import { LiquidBackground, Entrance, AnimatedPressable, AnimatedNumber } from '../../components/anim';
 import { colors, fontSizes, spacing } from '../../theme';
 import { useApp } from '../../lib/store';
 import { formatMoney, monthlySpend, relativeDay, spendByCategory } from '../../lib/financeEngine';
-import { walletBalances } from '../../lib/mockData';
+import { walletBalances, currencySymbols } from '../../lib/mockData';
 
 export default function Home() {
   const router = useRouter();
@@ -21,13 +23,13 @@ export default function Home() {
   const primaryBalance = walletBalances.find((w) => w.code === profile.currency) ?? walletBalances[0];
   const recent = transactions.slice(0, 6);
   const pendingRecs = recommendations.filter((r) => r.status === 'pending').slice(0, 2);
-  const spend30 = monthlySpend(transactions, 30);
   const yesterdaySpend = transactions
     .filter((t) => t.amount < 0 && relativeDay(t.date) === 'Yesterday')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
   const onTrack = healthScore.expenseControl >= 50;
   const topCategory = spendByCategory(transactions, 30)[0];
   const topGoal = goals[0];
+  const symbol = currencySymbols[profile.currency];
 
   const greeting = useMemo(() => {
     const h = new Date().getHours();
@@ -38,76 +40,105 @@ export default function Home() {
 
   return (
     <Screen edges={['top', 'left', 'right']}>
+      <LiquidBackground variant="aurora" />
+
       <View style={styles.hero}>
-        <View style={styles.topRow}>
-          <View>
-            <Text style={styles.greeting}>{greeting},</Text>
-            <Text style={styles.name}>{firstName}</Text>
+        <Entrance from="top">
+          <View style={styles.topRow}>
+            <View>
+              <Text style={styles.greeting}>{greeting},</Text>
+              <Text style={styles.name}>{firstName}</Text>
+            </View>
+            <AnimatedPressable style={styles.bellBtn} onPress={() => router.push('/notifications')}>
+              <Ionicons name="notifications-outline" size={20} color={colors.textPrimary} />
+              <View style={styles.bellDot} />
+            </AnimatedPressable>
           </View>
-          <Pressable style={styles.bellBtn} onPress={() => router.push('/notifications')}>
-            <Ionicons name="notifications-outline" size={20} color={colors.textPrimary} />
-            <View style={styles.bellDot} />
-          </Pressable>
-        </View>
+        </Entrance>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillRow} contentContainerStyle={{ gap: 10 }}>
-          {walletBalances.map((w) => (
-            <CurrencyPill key={w.code} flag={w.flag} code={w.code} amount={w.amount.toLocaleString()} />
-          ))}
-        </ScrollView>
+        <Entrance from="bottom" delay={80}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillRow} contentContainerStyle={{ gap: 10 }}>
+            {walletBalances.map((w) => (
+              <CurrencyPill key={w.code} flag={w.flag} code={w.code} amount={w.amount.toLocaleString()} />
+            ))}
+          </ScrollView>
+        </Entrance>
 
-        <View style={styles.balanceRow}>
-          <View>
-            <Text style={styles.balanceLabel}>Total balance</Text>
-            <Text style={styles.balance}>{formatMoney(primaryBalance.amount, profile.currency)}</Text>
+        <Entrance from="bottom" delay={140}>
+          <View style={styles.balanceRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.balanceLabel}>Total balance</Text>
+              <AnimatedNumber
+                value={primaryBalance.amount}
+                style={styles.balance}
+                format={(n) =>
+                  `${symbol}${symbol === 'AED' ? ' ' : ''}${n.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`
+                }
+              />
+            </View>
+            <AnimatedPressable onPress={() => router.push('/health-score')}>
+              <HealthGauge score={healthScore.total} size={84} />
+            </AnimatedPressable>
           </View>
-          <Pressable onPress={() => router.push('/health-score')}>
-            <HealthGauge score={healthScore.total} size={78} />
-          </Pressable>
-        </View>
+        </Entrance>
 
-        <View style={styles.actionsRow}>
-          <QuickAction icon="＋" label="Add" onPress={() => {}} />
-          <QuickAction icon="↗" label="Send" onPress={() => {}} />
-          <QuickAction icon="⇄" label="Convert" onPress={() => {}} />
-          <QuickAction icon="⋯" label="More" onPress={() => router.push('/(tabs)/more')} />
-        </View>
+        <Entrance from="bottom" delay={200}>
+          <View style={styles.actionsRow}>
+            <QuickAction icon="＋" label="Add" onPress={() => {}} />
+            <QuickAction icon="↗" label="Send" onPress={() => {}} />
+            <QuickAction icon="⇄" label="Convert" onPress={() => {}} />
+            <QuickAction icon="⋯" label="More" onPress={() => router.push('/(tabs)/more')} />
+          </View>
+        </Entrance>
       </View>
 
       <Sheet>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
-          <View style={styles.briefingCard}>
-            <View style={styles.briefingHeader}>
-              <Text style={styles.briefingIcon}>☀️</Text>
-              <Text style={styles.briefingTitle}>Daily briefing</Text>
-            </View>
-            <Text style={styles.briefingText}>
-              You spent {formatMoney(yesterdaySpend, profile.currency)} yesterday
-              {topCategory ? `, mostly on ${topCategory.category}` : ''}. Your{' '}
-              {topGoal ? `"${topGoal.name}"` : 'travel'} goal is{' '}
-              {topGoal ? Math.round((topGoal.currentAmount / topGoal.targetAmount) * 100) : 0}% funded. Overall you're{' '}
-              {onTrack ? 'tracking within budget this month.' : 'spending faster than usual this month — worth a look.'}
-            </Text>
-          </View>
+          <Entrance from="bottom" delay={260}>
+            <LinearGradient
+              colors={colors.gradientCardB}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.briefingCard}
+            >
+              <View style={styles.briefingHeader}>
+                <Text style={styles.briefingIcon}>☀️</Text>
+                <Text style={styles.briefingTitle}>Daily briefing</Text>
+              </View>
+              <Text style={styles.briefingText}>
+                You spent {formatMoney(yesterdaySpend, profile.currency)} yesterday
+                {topCategory ? `, mostly on ${topCategory.category}` : ''}. Your{' '}
+                {topGoal ? `"${topGoal.name}"` : 'travel'} goal is{' '}
+                {topGoal ? Math.round((topGoal.currentAmount / topGoal.targetAmount) * 100) : 0}% funded. Overall you're{' '}
+                {onTrack ? 'tracking within budget this month.' : 'spending faster than usual this month — worth a look.'}
+              </Text>
+            </LinearGradient>
+          </Entrance>
 
           {pendingRecs.length > 0 && (
             <>
               <SectionHeader title="Recommended for you" action="See all" onPressAction={() => router.push('/recommendations')} />
-              {pendingRecs.map((rec) => (
-                <RecommendationCard
-                  key={rec.id}
-                  rec={rec}
-                  onApprove={() => respondToRecommendation(rec.id, 'approved')}
-                  onReject={() => respondToRecommendation(rec.id, 'rejected')}
-                />
+              {pendingRecs.map((rec, i) => (
+                <Entrance key={rec.id} index={i} delay={320}>
+                  <RecommendationCard
+                    rec={rec}
+                    onApprove={() => respondToRecommendation(rec.id, 'approved')}
+                    onReject={() => respondToRecommendation(rec.id, 'rejected')}
+                  />
+                </Entrance>
               ))}
             </>
           )}
 
           <SectionHeader title="Transactions" action="View all" onPressAction={() => router.push('/transactions')} />
           <View>
-            {recent.map((tx) => (
-              <TransactionRow key={tx.id} tx={tx} currency={profile.currency} />
+            {recent.map((tx, i) => (
+              <Entrance key={tx.id} index={i} delay={360}>
+                <TransactionRow tx={tx} currency={profile.currency} />
+              </Entrance>
             ))}
           </View>
         </ScrollView>
@@ -126,6 +157,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: colors.bgCard,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -151,12 +184,13 @@ const styles = StyleSheet.create({
   briefingCard: {
     marginHorizontal: spacing.xl,
     marginBottom: spacing.xl,
-    backgroundColor: colors.inkPrimary,
     borderRadius: 20,
     padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
   },
   briefingHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   briefingIcon: { fontSize: 16 },
   briefingTitle: { color: colors.white, fontSize: fontSizes.sm, fontWeight: '700' },
-  briefingText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, lineHeight: 19 },
+  briefingText: { color: 'rgba(255,255,255,0.85)', fontSize: 13, lineHeight: 19 },
 });

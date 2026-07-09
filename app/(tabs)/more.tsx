@@ -1,11 +1,13 @@
 import React from 'react';
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Screen } from '../../components/Screen';
 import { colors, fontSizes, radius, spacing } from '../../theme';
 import { useApp } from '../../lib/store';
 import { Badge } from '../../components/UI';
+import { LiquidBackground, Entrance, AnimatedPressable } from '../../components/anim';
 
 export default function More() {
   const router = useRouter();
@@ -42,23 +44,33 @@ export default function More() {
 
   return (
     <Screen edges={['top', 'left', 'right']}>
+      <LiquidBackground variant="aurora" />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Text style={styles.title}>More</Text>
+        <Entrance from="top">
+          <Text style={styles.title}>More</Text>
+        </Entrance>
 
-        <View style={styles.profileCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials}</Text>
+        <Entrance from="bottom" delay={80}>
+          <View style={styles.profileCard}>
+            <LinearGradient
+              colors={colors.gradientAccent}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.avatar}
+            >
+              <Text style={styles.avatarText}>{initials}</Text>
+            </LinearGradient>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.profileName}>{profile.name || 'FinPilot User'}</Text>
+              <Text style={styles.profileMeta}>
+                {profile.currency} · {profile.country}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.profileName}>{profile.name || 'FinPilot User'}</Text>
-            <Text style={styles.profileMeta}>
-              {profile.currency} · {profile.country}
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
-        </View>
+        </Entrance>
 
-        <Section title="Insights & agents">
+        <Section title="Insights & agents" index={0}>
           <MenuRow
             icon="pulse-outline"
             label="Financial Health Score"
@@ -79,13 +91,13 @@ export default function More() {
           <MenuRow icon="receipt-outline" label="All transactions" onPress={() => router.push('/transactions')} />
         </Section>
 
-        <Section title="Preferences">
+        <Section title="Preferences" index={1}>
           <MenuRow icon="notifications-outline" label="Notifications" onPress={() => router.push('/notifications')} />
           <MenuRow icon="shield-checkmark-outline" label="Privacy & data" onPress={() => router.push('/privacy')} />
           <MenuRow icon="finger-print-outline" label="Security & biometrics" onPress={() => router.push('/privacy')} />
         </Section>
 
-        <Section title="Session">
+        <Section title="Session" index={2}>
           <MenuRow icon="refresh-outline" label="Restart demo" onPress={confirmReset} destructive />
         </Section>
 
@@ -95,12 +107,12 @@ export default function More() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children, index = 0 }: { title: string; children: React.ReactNode; index?: number }) {
   return (
-    <View style={styles.section}>
+    <Entrance from="bottom" delay={140 + index * 70} style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.sectionBody}>{children}</View>
-    </View>
+    </Entrance>
   );
 }
 
@@ -118,14 +130,14 @@ function MenuRow({
   destructive?: boolean;
 }) {
   return (
-    <Pressable style={styles.menuRow} onPress={onPress}>
+    <AnimatedPressable style={styles.menuRow} onPress={onPress} scaleTo={0.98}>
       <View style={styles.menuIconWrap}>
         <Ionicons name={icon} size={18} color={destructive ? colors.danger : colors.textPrimary} />
       </View>
       <Text style={[styles.menuLabel, destructive && { color: colors.danger }]}>{label}</Text>
       {trailing}
       <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 

@@ -5,6 +5,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { Screen } from '../../components/Screen';
 import { OnboardingHeader } from '../../components/OnboardingChrome';
 import { PrimaryButton } from '../../components/UI';
+import { LiquidBackground, Orb3D } from '../../components/anim';
 import { colors, fontSizes, spacing } from '../../theme';
 import { useApp } from '../../lib/store';
 
@@ -44,11 +45,17 @@ export default function BiometricSetup() {
 
   return (
     <Screen edges={['top', 'left', 'right', 'bottom']}>
+      <LiquidBackground variant="violet" />
       <OnboardingHeader step={3} total={5} />
       <View style={styles.content}>
-        <View style={styles.iconWrap}>
-          <Text style={styles.icon}>🔒</Text>
-        </View>
+        <Orb3D
+          size={120}
+          colorLight="#BBD0FF"
+          colorMid={colors.accent}
+          colorDark="#2E3EA0"
+          style={{ marginBottom: spacing.lg }}
+          glyph={<Text style={styles.icon}>🔒</Text>}
+        />
         <Text style={styles.title}>Secure your account</Text>
         <Text style={styles.subtitle}>
           Face ID / fingerprint unlock protects your dashboard and is required before approving any financial action.

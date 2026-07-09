@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Screen } from '../../components/Screen';
 import { OnboardingHeader } from '../../components/OnboardingChrome';
 import { PrimaryButton } from '../../components/UI';
+import { LiquidBackground } from '../../components/anim';
 import { colors, fontSizes, radius, spacing } from '../../theme';
 
 export default function Connect() {
@@ -12,6 +13,7 @@ export default function Connect() {
 
   return (
     <Screen edges={['top', 'left', 'right', 'bottom']}>
+      <LiquidBackground variant="teal" />
       <OnboardingHeader step={4} total={5} />
       <View style={styles.content}>
         <Text style={styles.title}>Connect your finances</Text>
